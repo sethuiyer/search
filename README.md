@@ -43,6 +43,13 @@ semantic_search.load_index(index_path)
 
 or train the index on your custom data by using the create\_and\_save\_embeddings. Pass the data as list of strings in the first argument then the index.tar.gz as second.
 
+```python
+from src.search import SemanticSearch
+semantic_search = SemanticSearch()
+semantic_search.load_index('index.tar.gz')
+print(semantic_search.search('Q4 performance forecast'))
+```
+
 ### Step 3: Performing a Search
 Perform semantic searches using the `search` method.
 

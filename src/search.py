@@ -1,3 +1,5 @@
+import os
+import time
 from collections import OrderedDict
 from txtai.embeddings import Embeddings
 from txtai.pipeline import Segmentation
@@ -71,10 +73,14 @@ class SemanticSearch:
             return
 
         # Index the processed data
+        start_time = time.time()
         self.embeddings.index((x, text, None) for x, text in enumerate(processed_data))
 
         # Save the embeddings index
         self.embeddings.save(index_path)
+        end_time = time.time()
+        time_taken = end_time - start_time
+        print(f"Embeddings generated and saved in {time_taken:.2f} seconds ⚡️")
         self.__emb_loaded__ = True
 
     def load_index(self, index_path):
@@ -90,7 +96,11 @@ class SemanticSearch:
         if not os.path.exists(index_path):
             print(f"Index file {index_path} does not exist. Unable to load embeddings.")
             return
+        start_time = time.time()
         self.embeddings.load(index_path)
+        end_time = time.time()
+        time_taken = end_time - start_time
+        print(f"Embeddings loaded in {time_taken:.2f} seconds ⚡️")
         self.__emb_loaded__ = True
 
     def calculate_dynamic_threshold(self, query):
@@ -126,6 +136,9 @@ class SemanticSearch:
             print("Embeddings are not loaded. Unable to perform search.")
             return None
 
+        start_time = time.time()
+        print(f"🔍 Query: {query}")
+
         # Calculate dynamic threshold
         dynamic_threshold = self.calculate_dynamic_threshold(query)
 
@@ -133,15 +146,21 @@ class SemanticSearch:
         results = self.embeddings.search(query, weights=dynamic_threshold, limit=limit)
 
         # Concatenate and preprocess text
-        relevant_results = ". ".join(result[1] for result in results).replace('keyflix_', '. keyflix_')
+        relevant_results = ". ".join(result['text'] for result in results)
+        
+        # This is to be removed
+        relevant_results = relevant_results.replace('keyflix_', '. keyflix_')
 
         # Split into sentences
-        sentences = self.segmenter([relevant_results])
+        sentences = self.segmenter(relevant_results)
 
         # Index and search using keyword embeddings
         keyword_embedder = Embeddings(keyword=True)
         keyword_embedder.index([(x, sentence, None) for x, sentence in enumerate(sentences)])
         keyword_results = keyword_embedder.search(query, limit=3)
-        return [x['text'] for x in keyword_results]
+        end_time = time.time()
+        time_taken = end_time - start_time
+        print(f"Search completed in {time_taken:.2f} seconds ⚡️")
+        return [sentences[x[0]] for x in keyword_results]
 
 
