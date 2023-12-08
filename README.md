@@ -36,18 +36,16 @@ wget https://huggingface.co/<user>/<repo>/resolve/main/index.tar.gz # or any URL
 ```
 
 Then you can simply 
-```python
-# Load the index file
-semantic_search.load_index(index_path)
-```
-
-or train the index on your custom data by using the create\_and\_save\_embeddings. Pass the data as list of strings in the first argument then the index.tar.gz as second.
 
 ```python
 from src.search import SemanticSearch
 semantic_search = SemanticSearch()
 semantic_search.load_index('index.tar.gz')
-print(semantic_search.search('Q4 performance forecast'))
+```
+or train the index on your custom data by using the create\_and\_save\_embeddings. Pass the data as list of strings in the first argument then the index.tar.gz as second.
+
+```python
+semantic_search.create_and_save_embeddings(dataset as list of segmented sentences, 'index.tar.gz')
 ```
 
 ### Step 3: Performing a Search
