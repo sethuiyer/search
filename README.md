@@ -60,6 +60,21 @@ for result in results:
     print(result)
 ```
 
+
+## Example
+
+Let's see the performance of this library on a custom dataset
+
+```bash
+python test.py 
+Embeddings loaded in 4.84 seconds ⚡️
+🔍 Query: kshipta avastha
+Search completed in 1.69 seconds ⚡️
+["When your mind doesn't want to budge, that is called the dull and listless state, when your mind does not want to budge It is called the Muda Avastha, which means The mind has not even come to the level of conscious thought It is just listless It is also called the donkey mind This is called the Muda Avastha The next state is Which also you go into, it is the Kshipta Avastha is kshitva avastha where you are very restless, very agitated, thinking many thoughts and unable to even listen or sit quiet mind.", 'I think this should be closed and after focused state there is a deepened ekagraha avastha which is called nirudha avastha which is possible only through yoga.', 'Agar successful hona ho to donkey monkey butterfly ko chodke ekagra avastha is normal to a healthy mind because it is not being carried away by some emotion, by silly thought process by some fear some anger no no this is not true.']
+```
+
+Extras:
+
 ## `llm_router.py`
 This script uses txtai to determine the query type and the appropriate tools required for processing.
 
