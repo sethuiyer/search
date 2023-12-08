@@ -35,16 +35,17 @@ def process_text(data, max_length=1500):
 
 
 class SemanticSearch:
-    def __init__(self, index_path, model_path="sentence-transformers/all-mpnet-base-v2"):
+    def __init__(self, config_dict=None):
         """
         Constructor for the SemanticSearch class.
 
         Parameters:
-        - index_path (str): Path to the embeddings index file.
         - model_path (str): Path to the pre-trained model for embeddings.
         """
         # Load the embeddings index
-        self.embeddings = Embeddings({"path": model_path, "content": "sqlite", "backend": "numpy", "hybrid": True})
+        if not config_dict:
+            self.config_dict = {"path": "sentence-transformers/all-mpnet-base-v2", "content": "sqlite", "backend": "numpy", "hybrid": True}
+        self.embeddings = Embeddings(self.config_dict)
         self.__emb_loaded__ = False
 
         # Internal variables
@@ -53,7 +54,7 @@ class SemanticSearch:
         self.weights = [0.1, 0.25, 0.5, 0.75, 0.9]
         self.segmenter = Segmentation(sentences=True, minlength=150)
 
-    def create_and_save_embeddings(self, processed_data, model_path="sentence-transformers/all-mpnet-base-v2", index_path="index.tar.gz"):
+    def create_and_save_embeddings(self, processed_data, index_path="index.tar.gz"):
         """
         Create and save embeddings for processed data using the txtai library.
 

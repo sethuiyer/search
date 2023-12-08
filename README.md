@@ -8,7 +8,6 @@ The project includes preparing a text corpus, indexing it using txtai, and then 
 ## Prerequisites
 - Python 3.6+
 - txtai library
-- Requests library for Python
 
 ## Corpus Preparation
 1. **Extract Text Data**:
@@ -25,31 +24,24 @@ This script uses txtai to process, index, and load the raw data present in `data
 Create an instance of the `SemanticSearch` class. Specify the model path for embeddings.
 
 ```python
-from semantic_search import SemanticSearch
-
-model_path = "sentence-transformers/all-mpnet-base-v2"
-semantic_search = SemanticSearch(model_path=model_path)
+from src.search import SemanticSearch
+semantic_search = SemanticSearch()
 ```
 
 ### Step 2: Download and Load the Index
 Download the index file and load it into the `SemanticSearch` instance.
 
+```bash
+wget https://huggingface.co/<user>/<repo>/resolve/main/index.tar.gz # or any URL where your index lives
+```
+
+Then you can simply 
 ```python
-import requests
-
-# URL of the index file
-url = "https://huggingface.co/<user>/<repo>/resolve/main/index.tar.gz"
-index_path = "index.tar.gz"
-
-# Downloading the index file
-response = requests.get(url)
-with open(index_path, "wb") as file:
-    file.write(response.content)
-
 # Load the index file
 semantic_search.load_index(index_path)
 ```
-or train the index on your custom data by using the create\_and\_save\_embeddings.
+
+or train the index on your custom data by using the create\_and\_save\_embeddings. Pass the data as list of strings in the first argument then the index.tar.gz as second.
 
 ### Step 3: Performing a Search
 Perform semantic searches using the `search` method.
