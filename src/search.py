@@ -128,7 +128,7 @@ class SemanticSearch:
         # Index and search using keyword embeddings
         keyword_embedder = Embeddings(keyword=True)
         keyword_embedder.index([(x, sentence, None) for x, sentence in enumerate(sentences)])
-        keyword_results = keyword_embedder.search(query, limit=5)
+        keyword_results = keyword_embedder.search(query, limit=8)
         keyword_results = filter_scores(keyword_results)
         relevant_results = [sentences[x[0]] for x in keyword_results]
         relevant_results = clean_strings(relevant_results)

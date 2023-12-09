@@ -42,7 +42,8 @@ def filter_scores(input_list):
         if cumulative_sum + element[1] < 0.85 and len(result_list) < 9:
             cumulative_sum += element[1]
             result_list.append(element)
-
+    if len(result_list) <= 4:
+        return input_list[:5]
     return result_list
 
 def clean_strings(strings):
