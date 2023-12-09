@@ -4,6 +4,7 @@ from collections import OrderedDict
 from txtai.embeddings import Embeddings
 from txtai.pipeline import Segmentation
 from txtai.pipeline import Labels
+from txtai.scoring import ScoringFactory
 from src.util import process_text, filter_scores, clean_strings
 
 
@@ -24,7 +25,7 @@ class SemanticSearch:
         # Internal variables
         self.labels = Labels('facebook/bart-large-mnli')
         self.tags = ['purely_lexical', 'mostly_lexical', 'balanced', 'mostly_semantic', 'purely_semantic']
-        self.weights = [0.1, 0.25, 0.5, 0.75, 0.9]
+        self.weights = [0.0, 0.25, 0.5, 0.75, 1.0]
         self.segmenter = Segmentation(sentences=True, minlength=150)
 
     def create_and_save_embeddings(self, processed_data, index_path="index.tar.gz"):
@@ -92,7 +93,7 @@ class SemanticSearch:
 
         return dynamic_threshold
 
-    def search(self, query, limit=5):
+    def search(self, query, limit=8):
         """
         Perform semantic search for the given query.
 
@@ -109,27 +110,16 @@ class SemanticSearch:
 
         start_time = time.time()
         print(f"🔍 Query: {query}")
-
-        # Calculate dynamic threshold
-        dynamic_threshold = self.calculate_dynamic_threshold(query)
-
-        # Perform search with dynamic threshold
-        results = self.embeddings.search(query, weights=dynamic_threshold, limit=limit)
-
-        # Concatenate and preprocess text
-        relevant_results = ". ".join(result['text'] for result in results)
         
-        # This is to be removed
+        dynamic_threshold = self.calculate_dynamic_threshold(query)
+        results = self.embeddings.search(query, weights=dynamic_threshold, limit=limit)
+        relevant_results = ". ".join(result['text'] for result in results)
         relevant_results = relevant_results.replace('keyflix_', '. keyflix_')
-
-        # Split into sentences
         sentences = process_text(self.segmenter(relevant_results), max_length=150)
-
-        # Index and search using keyword embeddings
-        keyword_embedder = Embeddings(keyword=True)
-        keyword_embedder.index([(x, sentence, None) for x, sentence in enumerate(sentences)])
-        keyword_results = keyword_embedder.search(query, limit=8)
-        keyword_results = filter_scores(keyword_results)
+        scoring = ScoringFactory.create({"method": "bm25", "terms": True})
+        scoring.index((x, sentence, None) for x, sentence in enumerate(sentences))
+        reduced_query = self.embeddings.terms(query)
+        keyword_results = scoring.search(reduced_query, 5)
         relevant_results = [sentences[x[0]] for x in keyword_results]
         relevant_results = clean_strings(relevant_results)
         end_time = time.time()
