@@ -4,36 +4,7 @@ from collections import OrderedDict
 from txtai.embeddings import Embeddings
 from txtai.pipeline import Segmentation
 from txtai.pipeline import Labels
-
-def process_text(data, max_length=1500):
-    """
-    Process a list of sentences into units, each containing sentences with a combined length not exceeding max_length.
-
-    Parameters:
-    - data (list): A list of sentences.
-    - max_length (int): Maximum allowed length for combined sentences in a unit.
-
-    Returns:
-    - list: A list of units, each containing combined sentences with lengths not exceeding max_length.
-    """
-    unique_data = list(OrderedDict.fromkeys(data))
-
-    combined_units = []
-    current_unit = []
-
-    for sentence in unique_data:
-        # Check if adding the current sentence exceeds the maximum length
-        if sum(len(s) for s in current_unit) + len(sentence) <= max_length:
-            current_unit.append(sentence)
-        else:
-            combined_units.append(" ".join(current_unit))
-            current_unit = [sentence]
-
-    # Add the last unit if it's not empty
-    if current_unit:
-        combined_units.append(" ".join(current_unit))
-
-    return combined_units
+from src.util import process_text, filter_scores, clean_strings
 
 
 class SemanticSearch:
@@ -152,15 +123,18 @@ class SemanticSearch:
         relevant_results = relevant_results.replace('keyflix_', '. keyflix_')
 
         # Split into sentences
-        sentences = self.segmenter(relevant_results)
+        sentences = process_text(self.segmenter(relevant_results), max_length=150)
 
         # Index and search using keyword embeddings
         keyword_embedder = Embeddings(keyword=True)
         keyword_embedder.index([(x, sentence, None) for x, sentence in enumerate(sentences)])
-        keyword_results = keyword_embedder.search(query, limit=3)
+        keyword_results = keyword_embedder.search(query, limit=5)
+        keyword_results = filter_scores(keyword_results)
+        relevant_results = [sentences[x[0]] for x in keyword_results]
+        relevant_results = clean_strings(relevant_results)
         end_time = time.time()
         time_taken = end_time - start_time
         print(f"Search completed in {time_taken:.2f} seconds ⚡️")
-        return [sentences[x[0]] for x in keyword_results]
+        return relevant_results
 
 
