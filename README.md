@@ -147,6 +147,7 @@ This script uses txtai to determine the query type and the appropriate tools req
 result = classifier.classify_instructions(["Draft a poem which also proves that sqrt of 2 is irrational"])
 print(result)
 ```
+**Blog**: https://techmate.hashnode.dev/enhancing-search-with-zero-shot-classification
 
 If you find this code useful in your research, please consider citing it as follows:
 
