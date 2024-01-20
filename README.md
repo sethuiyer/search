@@ -148,3 +148,7 @@ result = classifier.classify_instructions(["Draft a poem which also proves that 
 print(result)
 ```
 
+If you find this code useful in your research, please consider citing it as follows:
+
+Sethurathienam Iyer, "Semantic Search with One-Shot Classification," 2024. Available at: https://github.com/sethuiyer/search
+
